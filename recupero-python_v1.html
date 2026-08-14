@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quaderno di recupero — Python, classe seconda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f4f1e6;
+  --paper-dark:#ece7d6;
+  --ink:#2a2a28;
+  --ink-soft:#5b5850;
+  --rule:#c3d0e0;
+  --margin:#c1483f;
+  --pen-blue:#2f4d7e;
+  --pen-blue-dark:#203658;
+  --highlight:#f4d35e;
+  --highlight-soft:#fbe9a8;
+  --green:#3f7a4e;
+  --paper-shadow: 0 1px 0 rgba(0,0,0,.04);
+  --radius: 3px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper-dark);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--highlight);}
+
+/* ---------- Copertina ---------- */
+.cover{
+  position:relative;
+  min-height:78vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:8vh 8vw 10vh;
+  background:
+    repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
+  border-bottom:3px solid var(--ink);
+  overflow:hidden;
+}
+.cover::before{
+  content:"";
+  position:absolute; top:0; bottom:0; left:min(11%,90px);
+  width:2px; background:var(--margin); opacity:.55;
+}
+.cover .kicker{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.8rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--pen-blue);
+  font-weight:700;
+  margin-left:min(11%,90px);
+  padding-left:28px;
+}
+.cover h1{
+  font-family:'Caveat',cursive;
+  font-weight:700;
+  font-size:clamp(3rem,8vw,6.2rem);
+  line-height:.95;
+  margin:.2em 0 .1em min(11%,90px);
+  padding-left:28px;
+  color:var(--ink);
+  max-width:15ch;
+}
+.cover h1 em{
+  font-style:normal;
+  color:var(--margin);
+  text-decoration:underline;
+  text-decoration-style:wavy;
+  text-decoration-color:var(--highlight);
+  text-decoration-thickness:3px;
+  text-underline-offset:6px;
+}
+.cover p.sub{
+  margin:.4em 0 0 min(11%,90px);
+  padding-left:28px;
+  max-width:52ch;
+  font-size:1.05rem;
+  color:var(--ink-soft);
+  line-height:1.6;
+}
+.cover .stamp{
+  margin:2.2em 0 0 min(11%,90px);
+  padding-left:28px;
+  display:flex; gap:14px; flex-wrap:wrap;
+}
+.stamp span{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;
+  border:1.5px solid var(--pen-blue);
+  color:var(--pen-blue);
+  padding:5px 10px;
+  border-radius:20px;
+  transform:rotate(-1.4deg);
+  background:rgba(47,77,126,.04);
+}
+.stamp span:nth-child(2){transform:rotate(1.1deg);border-color:var(--margin);color:var(--margin);background:rgba(193,72,63,.04);}
+.stamp span:nth-child(3){transform:rotate(-0.6deg);}
+
+/* ---------- Indice a schede (raccoglitore) ---------- */
+.tabbar-wrap{
+  position:sticky; top:0; z-index:50;
+  background:var(--paper-dark);
+  border-bottom:3px solid var(--ink);
+}
+.tabbar{
+  display:flex;
+  max-width:1180px;
+  margin:0 auto;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.tabbar::-webkit-scrollbar{display:none;}
+.tab{
+  flex:1 1 0;
+  min-width:150px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.82rem;
+  font-weight:600;
+  text-align:left;
+  cursor:pointer;
+  border:none;
+  border-right:1.5px solid var(--ink);
+  background:var(--paper-dark);
+  color:var(--ink-soft);
+  padding:16px 16px 14px;
+  position:relative;
+  transition:background .15s ease, color .15s ease;
+}
+.tab .n{
+  display:block;
+  font-family:'Caveat',cursive;
+  font-size:1.5rem;
+  font-weight:700;
+  color:var(--pen-blue);
+  line-height:1;
+  margin-bottom:2px;
+}
+.tab:last-child{border-right:none;}
+.tab:hover{background:var(--paper);}
+.tab.active{
+  background:var(--paper);
+  color:var(--ink);
+}
+.tab.active .n{color:var(--margin);}
+.tab.active::after{
+  content:"";
+  position:absolute; left:0; right:0; bottom:-3px;
+  height:4px; background:var(--highlight);
+}
+
+/* ---------- Corpo pagina ---------- */
+main{
+  max-width:1180px;
+  margin:0 auto;
+  background:var(--paper);
+  min-height:60vh;
+  box-shadow:var(--paper-shadow);
+}
+.lezione{
+  display:none;
+  padding:56px min(9%,80px) 90px;
+  position:relative;
+  background:
+    repeating-linear-gradient(var(--paper) 0px, var(--paper) 35px, var(--rule) 36px, var(--paper) 37px);
+}
+.lezione.active{display:block;}
+.lezione::before{
+  content:"";
+  position:absolute; top:0; bottom:0; left:min(9%,80px);
+  width:2px; background:var(--margin); opacity:.45;
+}
+
+.lez-head{padding-left:26px; margin-bottom:8px;}
+.lez-head .eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;
+  color:var(--pen-blue);
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  font-weight:700;
+}
+.lez-head h2{
+  font-family:'Caveat',cursive;
+  font-size:clamp(2.4rem,4.6vw,3.4rem);
+  margin:.1em 0 .2em;
+  line-height:1;
+}
+.lez-head .obiettivi{
+  color:var(--ink-soft);
+  font-size:.98rem;
+  max-width:70ch;
+  line-height:1.6;
+}
+
+/* ---------- Ripasso ---------- */
+.ripasso{
+  margin:34px 0 46px 26px;
+  background:var(--paper-dark);
+  border:1.5px solid var(--ink);
+  border-radius:var(--radius);
+  padding:22px 24px 24px;
+  position:relative;
+}
+.ripasso::before{
+  content:"RIPASSO LAMPO";
+  position:absolute; top:-11px; left:18px;
+  background:var(--highlight);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  padding:2px 10px;
+  border:1.5px solid var(--ink);
+  border-radius:12px;
+}
+.ripasso h3{
+  font-family:'Inter',sans-serif;
+  font-size:.92rem;
+  font-weight:800;
+  color:var(--pen-blue-dark);
+  margin:16px 0 6px;
+}
+.ripasso h3:first-child{margin-top:2px;}
+.ripasso p{
+  margin:0 0 8px;
+  font-size:.94rem;
+  line-height:1.65;
+  color:var(--ink);
+}
+.ripasso code{
+  font-family:'JetBrains Mono',monospace;
+  background:rgba(47,77,126,.09);
+  color:var(--pen-blue-dark);
+  padding:1px 5px;
+  border-radius:3px;
+  font-size:.86em;
+}
+.ripasso pre{
+  background:#20241f;
+  color:#e9e6d8;
+  padding:12px 14px;
+  border-radius:var(--radius);
+  overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.82rem;
+  line-height:1.55;
+  margin:6px 0 4px;
+}
+
+/* ---------- Esercizi ---------- */
+.es-title{
+  font-family:'Caveat',cursive;
+  font-size:1.7rem;
+  margin:0 0 18px 26px;
+  color:var(--ink);
+}
+.es-title .badge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.7rem;
+  vertical-align:middle;
+  color:var(--ink-soft);
+  border:1px solid var(--ink-soft);
+  border-radius:10px;
+  padding:2px 8px;
+  margin-left:8px;
+}
+.esercizio{
+  margin:0 0 14px 26px;
+  background:#fffef9;
+  border:1.5px solid #d8d2bd;
+  border-radius:var(--radius);
+  transition:border-color .15s ease;
+}
+.esercizio[open]{border-color:var(--pen-blue);}
+.esercizio summary{
+  list-style:none;
+  cursor:pointer;
+  padding:14px 18px;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+}
+.esercizio summary::-webkit-details-marker{display:none;}
+.es-num{
+  flex:0 0 auto;
+  width:30px; height:30px;
+  border:2px solid var(--pen-blue);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Caveat',cursive;
+  font-weight:700;
+  font-size:1.15rem;
+  color:var(--pen-blue);
+  transform:rotate(-2deg);
+}
+.esercizio[open] .es-num{background:var(--pen-blue); color:#fff;}
+.es-testo{
+  flex:1 1 auto;
+  font-size:.96rem;
+  line-height:1.55;
+  padding-top:3px;
+}
+.es-diff{
+  flex:0 0 auto;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.68rem;
+  color:var(--ink-soft);
+  padding-top:6px;
+  white-space:nowrap;
+}
+.es-toggle{
+  flex:0 0 auto;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.72rem;
+  font-weight:700;
+  color:#fff;
+  background:var(--margin);
+  border-radius:14px;
+  padding:5px 12px;
+  align-self:center;
+  transform:rotate(-1deg);
+}
+.esercizio[open] .es-toggle{background:var(--green);}
+.es-toggle::before{content:"correggi ✓";}
+.esercizio[open] .es-toggle::before{content:"nascondi";}
+.es-sol{
+  padding:0 18px 18px 60px;
+  border-top:1px dashed #cfc9b2;
+  margin-top:2px;
+}
+.es-sol pre{
+  background:#20241f;
+  color:#e9e6d8;
+  padding:12px 14px;
+  border-radius:var(--radius);
+  overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.82rem;
+  line-height:1.55;
+  margin:10px 0 8px;
+}
+.es-sol .spiega{
+  font-size:.88rem;
+  color:var(--ink-soft);
+  line-height:1.6;
+  border-left:3px solid var(--highlight);
+  padding-left:10px;
+  margin-top:8px;
+}
+.es-sol .spiega b{color:var(--ink);}
+
+/* ---------- Navigazione fondo lezione ---------- */
+.lez-nav{
+  display:flex; justify-content:space-between; align-items:center;
+  margin:44px 0 0 26px;
+  padding-top:20px;
+  border-top:2px solid var(--ink);
+}
+.lez-nav button{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.82rem;
+  font-weight:700;
+  background:none;
+  border:1.5px solid var(--ink);
+  padding:9px 16px;
+  border-radius:20px;
+  cursor:pointer;
+  color:var(--ink);
+  transition:background .15s ease, color .15s ease;
+}
+.lez-nav button:hover:not(:disabled){background:var(--ink); color:var(--paper);}
+.lez-nav button:disabled{opacity:.3; cursor:default;}
+.lez-nav .progress{
+  font-family:'Caveat',cursive;
+  font-size:1.3rem;
+  color:var(--pen-blue);
+}
+
+footer{
+  text-align:center;
+  padding:26px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.72rem;
+  color:var(--ink-soft);
+  background:var(--paper-dark);
+}
+
+@media (max-width:640px){
+  .cover{padding:9vh 6vw 8vh;}
+  .cover::before{left:26px;}
+  .cover .kicker,.cover h1,.cover p.sub,.cover .stamp{margin-left:26px; padding-left:18px;}
+  .lezione::before{left:22px;}
+  .lezione{padding:40px 5vw 70px;}
+  .lez-head,.ripasso,.es-title,.esercizio,.lez-nav{margin-left:14px;}
+  .lez-head{padding-left:16px;}
+  .es-sol{padding-left:20px;}
+}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="kicker">Recupero carenza · Informatica · Classe seconda</div>
+  <h1>Il quaderno<br>del <em>recupero</em></h1>
+  <p class="sub">Cinque lezioni per rimettere in ordine le basi di Python: dalle variabili alle liste. Ogni lezione ha un ripasso veloce e una decina di esercizi, dal più semplice al più impegnativo. Prova a scrivere il codice prima di aprire la correzione.</p>
+  <div class="stamp">
+    <span>5 lezioni</span>
+    <span>~50 esercizi</span>
+    <span>difficoltà crescente</span>
+  </div>
+</div>
+
+<div class="tabbar-wrap">
+  <div class="tabbar" id="tabbar"></div>
+</div>
+
+<main>
+  <div id="lezioni-container"></div>
+</main>
+
+<footer>quaderno di recupero — informatica, classe seconda</footer>
+
+<script>
+const LEZIONI = [
+{
+  titolo: "Variabili, tipi di dato e I/O",
+  eyebrow: "Lezione 1 di 5",
+  obiettivi: "Variabili, tipi di dato fondamentali, operatori aritmetici, input(), print(), casting con int/float/str.",
+  ripasso: `
+    <h3>Variabili e tipi di dato</h3>
+    <p>Una variabile è un nome che punta a un valore in memoria. In Python non si dichiara il tipo: viene dedotto automaticamente. I tipi fondamentali sono <code>int</code> (interi), <code>float</code> (decimali), <code>str</code> (stringhe/testo) e <code>bool</code> (True/False). Con <code>type(x)</code> si scopre il tipo di una variabile.</p>
+    <pre>eta = 15          # int
+altezza = 1.68     # float
+nome = "Luca"      # str
+maggiorenne = False # bool
+print(type(eta))   # &lt;class 'int'&gt;</pre>
+    <h3>Operatori aritmetici</h3>
+    <p>Python usa <code>+ - * /</code> per le quattro operazioni, <code>//</code> per la divisione intera, <code>%</code> per il resto (modulo) e <code>**</code> per l'elevamento a potenza.</p>
+    <pre>print(7 / 2)   # 3.5   (divisione normale, dà sempre float)
+print(7 // 2)  # 3     (divisione intera)
+print(7 % 2)   # 1     (resto della divisione)
+print(2 ** 3)  # 8     (potenza)</pre>
+    <h3>Input e output</h3>
+    <p><code>print()</code> stampa a video. <code>input()</code> mette in pausa il programma, legge quello che scrive l'utente e lo restituisce <b>sempre come stringa</b>, anche se sembra un numero.</p>
+    <pre>nome = input("Come ti chiami? ")
+print("Ciao,", nome)</pre>
+    <h3>Casting</h3>
+    <p>Il casting converte un valore da un tipo a un altro: <code>int("5")</code> → 5, <code>float("3.2")</code> → 3.2, <code>str(10)</code> → "10". Serve quasi sempre dopo un <code>input()</code>, se vogliamo fare calcoli con il numero inserito.</p>
+    <pre>eta = int(input("Età: "))
+print(eta + 1)   # senza il casting, l'input darebbe errore con +1</pre>
+  `,
+  esercizi: [
+    {t:'Scrivi un programma che stampa a video la frase <code>Ciao, mondo!</code>', d:'●', sol:'print("Ciao, mondo!")', sp:'La funzione <b>print()</b> è la più semplice forma di output: scrive tra parentesi quello che vuoi mostrare a video.'},
+    {t:'Crea due variabili <code>nome</code> e <code>eta</code> (assegnale tu direttamente, es. "Marco" e 16) e stampale in una sola riga con <code>print</code>, separandole con una virgola.', d:'●', sol:'nome = "Marco"\neta = 16\nprint(nome, eta)', sp:'Passando più valori a <b>print</b> separati da virgola, Python li stampa uno dopo l\'altro con uno spazio in mezzo, anche se sono di tipo diverso.'},
+    {t:'Chiedi il nome all\'utente con <code>input()</code> e stampa <code>Ciao, &lt;nome&gt;!</code>', d:'●', sol:'nome = input("Come ti chiami? ")\nprint("Ciao, " + nome + "!")', sp:'Il valore restituito da <b>input()</b> è sempre una stringa, quindi si può concatenare con <code>+</code> ad altre stringhe.'},
+    {t:'Chiedi all\'utente due numeri interi (uno alla volta) e stampa la loro somma. Attenzione al casting!', d:'●●', sol:'a = int(input("Primo numero: "))\nb = int(input("Secondo numero: "))\nprint("Somma:", a + b)', sp:'Senza <b>int()</b>, <code>a + b</code> concatenerebbe le due stringhe invece di sommarle (es. "3"+"4" → "34").'},
+    {t:'Assegna a una variabile il valore <code>7</code> e stampa il suo tipo usando <code>type()</code>. Poi assegna alla stessa variabile il valore <code>7.0</code> e stampa di nuovo il tipo.', d:'●●', sol:'x = 7\nprint(type(x))   # &lt;class \'int\'&gt;\nx = 7.0\nprint(type(x))   # &lt;class \'float\'&gt;', sp:'In Python una variabile non è legata a un tipo fisso: può cambiare tipo se le si riassegna un valore diverso.'},
+    {t:'Chiedi all\'utente base e altezza di un rettangolo (numeri decimali) e calcola area e perimetro.', d:'●●', sol:'base = float(input("Base: "))\naltezza = float(input("Altezza: "))\narea = base * altezza\nperimetro = 2 * (base + altezza)\nprint("Area:", area)\nprint("Perimetro:", perimetro)', sp:'Usiamo <b>float()</b> perché le misure possono avere la virgola, a differenza di un conteggio di persone che userebbe <code>int</code>.'},
+    {t:'Dato il prezzo unitario di un prodotto (decimale) e la quantità acquistata (intero), entrambi inseriti da tastiera, calcola e stampa il totale da pagare.', d:'●●●', sol:'prezzo = float(input("Prezzo unitario: "))\nquantita = int(input("Quantità: "))\ntotale = prezzo * quantita\nprint("Totale da pagare:", totale, "€")', sp:'Ogni <b>input()</b> va convertito col tipo giusto per la sua natura: il prezzo è decimale, la quantità è un numero intero di pezzi.'},
+    {t:'Chiedi all\'utente l\'anno di nascita e calcola (in modo approssimativo) l\'età che avrà nel 2026.', d:'●●●', sol:'anno_nascita = int(input("Anno di nascita: "))\neta = 2026 - anno_nascita\nprint("Nel 2026 avrai circa", eta, "anni")', sp:'È un calcolo approssimato perché non teniamo conto del mese di nascita, ma è un buon esercizio su input, casting e operatori aritmetici insieme.'},
+    {t:'Scambia i valori di due variabili <code>a</code> e <code>b</code> (a=5, b=9) <b>senza</b> usare una terza variabile di appoggio, stampando i valori prima e dopo lo scambio.', d:'●●●●', sol:'a = 5\nb = 9\nprint("Prima:", a, b)\na, b = b, a\nprint("Dopo:", a, b)', sp:'Python permette l\'assegnazione multipla <code>a, b = b, a</code>: calcola prima tutta la parte a destra e poi assegna, quindi non serve una variabile temporanea.'},
+    {t:'Chiedi due numeri interi e stampa quoziente intero (<code>//</code>) e resto (<code>%</code>) della divisione tra il primo e il secondo, spiegando a video cosa rappresentano.', d:'●●●●', sol:'a = int(input("Dividendo: "))\nb = int(input("Divisore: "))\nprint(a, "diviso", b, "= quoziente", a // b, "resto", a % b)', sp:'<code>//</code> e <code>%</code> sono le due operazioni della divisione con resto che si impara alle elementari: insieme permettono di ricostruire la divisione intera completa.'},
+  ]
+},
+{
+  titolo: "Selezione, operatori relazionali e booleani",
+  eyebrow: "Lezione 2 di 5",
+  obiettivi: "Operatori relazionali e booleani, algebra booleana, if / elif / else, selezione annidata.",
+  ripasso: `
+    <h3>Operatori relazionali</h3>
+    <p>Confrontano due valori e restituiscono sempre <code>True</code> o <code>False</code>: <code>&lt;  &gt;  &lt;=  &gt;=  ==  !=</code>. L'operatore <code>in</code> verifica se un elemento appartiene a una sequenza (lista, stringa...).</p>
+    <pre>print(5 == 5)     # True
+print(5 != 3)     # True
+print("a" in "casa")  # True</pre>
+    <h3>Operatori booleani e algebra booleana</h3>
+    <p><code>and</code>, <code>or</code>, <code>not</code> combinano condizioni. <code>and</code> è vero solo se entrambe le condizioni sono vere, <code>or</code> è vero se almeno una lo è, <code>not</code> nega. Queste regole formano l'<b>algebra booleana</b>, la stessa che sta dietro alle tavole di verità.</p>
+    <pre>eta = 20
+patente = True
+print(eta >= 18 and patente)   # True → può guidare</pre>
+    <h3>Selezione: if / elif / else</h3>
+    <p>Permette di eseguire codice solo se una condizione è vera. <code>elif</code> aggiunge condizioni alternative, <code>else</code> gestisce tutti i casi rimanenti.</p>
+    <pre>voto = 7
+if voto &lt; 6:
+    print("Insufficiente")
+elif voto &lt; 8:
+    print("Sufficiente")
+else:
+    print("Ottimo")</pre>
+    <h3>Selezione annidata</h3>
+    <p>Un <code>if</code> può contenere al suo interno un altro <code>if</code>, utile quando una scelta dipende da un'altra.</p>
+    <pre>if eta &gt;= 18:
+    if patente:
+        print("Puoi guidare")
+    else:
+        print("Devi prendere la patente")</pre>
+  `,
+  esercizi: [
+    {t:'Chiedi un numero e stampa se è <b>positivo</b>, <b>negativo</b> o <b>zero</b>.', d:'●', sol:'n = float(input("Numero: "))\nif n > 0:\n    print("Positivo")\nelif n < 0:\n    print("Negativo")\nelse:\n    print("Zero")', sp:'Tre casi esclusivi si gestiscono naturalmente con <code>if / elif / else</code>.'},
+    {t:'Chiedi un numero intero e stampa se è <b>pari</b> o <b>dispari</b>.', d:'●', sol:'n = int(input("Numero: "))\nif n % 2 == 0:\n    print("Pari")\nelse:\n    print("Dispari")', sp:'Un numero è pari se il resto della divisione per 2 (<code>%</code>) è 0.'},
+    {t:'Chiedi l\'età e stampa se la persona è <b>maggiorenne</b> o <b>minorenne</b>.', d:'●', sol:'eta = int(input("Età: "))\nif eta >= 18:\n    print("Maggiorenne")\nelse:\n    print("Minorenne")', sp:'Un confronto relazionale (<code>&gt;=</code>) basta quando i casi sono solo due.'},
+    {t:'Dati due numeri inseriti dall\'utente, stampa il maggiore <b>senza</b> usare la funzione <code>max()</code>.', d:'●●', sol:'a = float(input("Primo numero: "))\nb = float(input("Secondo numero: "))\nif a > b:\n    print("Il maggiore è", a)\nelif b > a:\n    print("Il maggiore è", b)\nelse:\n    print("Sono uguali")', sp:'Bisogna considerare anche il caso in cui i due numeri sono uguali, altrimenti manca un caso.'},
+    {t:'Chiedi tre numeri e stampa il maggiore dei tre, usando <code>if</code> annidati oppure <code>and</code>.', d:'●●', sol:'a = float(input("a: "))\nb = float(input("b: "))\nc = float(input("c: "))\nif a >= b and a >= c:\n    print("Il maggiore è a =", a)\nelif b >= a and b >= c:\n    print("Il maggiore è b =", b)\nelse:\n    print("Il maggiore è c =", c)', sp:'Usare <code>and</code> per confrontare ogni numero con <b>entrambi</b> gli altri evita di dover annidare troppi <code>if</code>.'},
+    {t:'Chiedi un anno e stabilisci se è <b>bisestile</b>: divisibile per 4, ma non per 100 a meno che non sia divisibile anche per 400.', d:'●●●', sol:'anno = int(input("Anno: "))\nbisestile = (anno % 4 == 0 and anno % 100 != 0) or (anno % 400 == 0)\nif bisestile:\n    print(anno, "è bisestile")\nelse:\n    print(anno, "non è bisestile")', sp:'La regola si traduce riga per riga in algebra booleana: <code>(div per 4 e non per 100) oppure (div per 400)</code>.'},
+    {t:'Chiedi un voto da 0 a 10 e stampa il giudizio: <code>&lt;6</code> insufficiente, <code>6-7</code> sufficiente, <code>8-9</code> buono, <code>10</code> ottimo.', d:'●●●', sol:'voto = int(input("Voto: "))\nif voto < 6:\n    print("Insufficiente")\nelif voto <= 7:\n    print("Sufficiente")\nelif voto <= 9:\n    print("Buono")\nelse:\n    print("Ottimo")', sp:'Una catena di <code>elif</code> valuta le condizioni in ordine: appena una è vera, le altre non vengono più controllate.'},
+    {t:'Simula un controllo accessi: chiedi username e password e confrontali (con <code>and</code>) con dei valori fissi scelti da te. Stampa "Accesso consentito" o "Accesso negato".', d:'●●●', sol:'utente = input("Username: ")\npassword = input("Password: ")\nif utente == "admin" and password == "1234":\n    print("Accesso consentito")\nelse:\n    print("Accesso negato")', sp:'Entrambe le condizioni (username giusto <b>e</b> password giusta) devono essere vere: è il tipico uso di <code>and</code> in un controllo di sicurezza.'},
+    {t:'Chiedi le lunghezze di tre lati e verifica se possono formare un triangolo: ogni lato deve essere minore della somma degli altri due.', d:'●●●●', sol:'a = float(input("Lato a: "))\nb = float(input("Lato b: "))\nc = float(input("Lato c: "))\nif a < b + c and b < a + c and c < a + b:\n    print("I tre lati formano un triangolo")\nelse:\n    print("Non è un triangolo valido")', sp:'Bastano tre condizioni collegate da <code>and</code>: basta che una sola sia falsa perché il triangolo non sia valido (disuguaglianza triangolare).'},
+    {t:'Chiedi tre valori booleani A, B, C (scrivendo <code>True</code> o <code>False</code>) e calcola il risultato dell\'espressione <code>(A and B) or (not C)</code>.', d:'●●●●●', sol:'A = input("A (True/False): ") == "True"\nB = input("B (True/False): ") == "True"\nC = input("C (True/False): ") == "True"\nrisultato = (A and B) or (not C)\nprint("(A and B) or (not C) =", risultato)', sp:'L\'input è sempre testo, quindi confrontiamo la stringa digitata con <code>"True"</code> per ottenere un vero booleano: è un esempio di espressione booleana composta, come nelle tavole di verità.'},
+  ]
+},
+{
+  titolo: "Moduli math e random, il ciclo while",
+  eyebrow: "Lezione 3 di 5",
+  obiettivi: "I moduli math e random, la ripetizione indefinita con while.",
+  ripasso: `
+    <h3>Il modulo math</h3>
+    <p>Va importato con <code>import math</code> e offre funzioni matematiche: <code>math.sqrt(x)</code> (radice quadrata), <code>math.pi</code>, <code>math.floor(x)</code> e <code>math.ceil(x)</code> (arrotondamento per difetto/eccesso).</p>
+    <pre>import math
+print(math.sqrt(16))     # 4.0
+print(math.pi)            # 3.14159...
+print(math.floor(4.8))    # 4
+print(math.ceil(4.1))     # 5</pre>
+    <h3>Il modulo random</h3>
+    <p>Va importato con <code>import random</code>. <code>random.randint(a, b)</code> genera un intero casuale tra <code>a</code> e <code>b</code> (estremi inclusi); <code>random.random()</code> genera un decimale tra 0 e 1; <code>random.choice(lista)</code> sceglie un elemento a caso.</p>
+    <pre>import random
+dado = random.randint(1, 6)
+print(dado)</pre>
+    <h3>La ripetizione indefinita: while</h3>
+    <p>Il ciclo <code>while</code> ripete un blocco di codice <b>finché</b> una condizione resta vera. Non sappiamo a priori quante volte girerà: dipende da cosa succede dentro il ciclo. Bisogna sempre assicurarsi che, prima o poi, la condizione diventi falsa, altrimenti si ottiene un ciclo infinito.</p>
+    <pre>n = 1
+while n <= 5:
+    print(n)
+    n = n + 1   # senza questa riga il ciclo non finirebbe mai</pre>
+  `,
+  esercizi: [
+    {t:'Chiedi un numero e stampa la sua radice quadrata usando <code>math.sqrt</code>.', d:'●', sol:'import math\nn = float(input("Numero: "))\nprint("Radice quadrata:", math.sqrt(n))', sp:'Bisogna sempre importare il modulo prima di usarlo, con <code>import math</code> in cima al programma.'},
+    {t:'Chiedi il raggio di un cerchio e calcolane l\'area usando <code>math.pi</code>.', d:'●', sol:'import math\nraggio = float(input("Raggio: "))\narea = math.pi * raggio ** 2\nprint("Area del cerchio:", area)', sp:'<code>math.pi</code> è una costante già pronta, più precisa che scrivere "3.14" a mano.'},
+    {t:'Genera un numero casuale intero tra 1 e 100 con <code>random.randint</code> e stampalo.', d:'●', sol:'import random\nnumero = random.randint(1, 100)\nprint(numero)', sp:'<code>randint(a, b)</code> include sia <code>a</code> che <code>b</code> tra i possibili risultati.'},
+    {t:'Simula il lancio di un dado a 6 facce e stampa il risultato.', d:'●', sol:'import random\ndado = random.randint(1, 6)\nprint("Hai tirato:", dado)', sp:'Un dado ha valori da 1 a 6: basta un solo <code>randint(1, 6)</code>.'},
+    {t:'Usa un ciclo <code>while</code> per stampare i numeri da 1 a 10.', d:'●●', sol:'n = 1\nwhile n <= 10:\n    print(n)\n    n += 1', sp:'La variabile <code>n</code> viene incrementata a ogni giro (<code>n += 1</code>): è questo che, prima o poi, rende falsa la condizione e ferma il ciclo.'},
+    {t:'Scrivi un programma che chiede numeri all\'utente, uno alla volta, finché non digita <code>0</code>. A quel punto stampa "Fine".', d:'●●●', sol:'numero = int(input("Inserisci un numero (0 per uscire): "))\nwhile numero != 0:\n    numero = int(input("Inserisci un numero (0 per uscire): "))\nprint("Fine")', sp:'La condizione di uscita (<code>numero != 0</code>) viene ricontrollata a ogni ciclo: appena l\'utente digita 0, il <code>while</code> si ferma.'},
+    {t:'Scrivi il gioco "indovina il numero": genera un numero casuale tra 1 e 100; l\'utente prova a indovinarlo, e il programma risponde "troppo alto" o "troppo basso" finché non lo trova.', d:'●●●●', sol:'import random\nsegreto = random.randint(1, 100)\ntentativo = int(input("Indovina il numero (1-100): "))\nwhile tentativo != segreto:\n    if tentativo > segreto:\n        print("Troppo alto")\n    else:\n        print("Troppo basso")\n    tentativo = int(input("Riprova: "))\nprint("Hai indovinato!")', sp:'Il ciclo continua finché <code>tentativo != segreto</code>: a ogni giro viene chiesto un nuovo tentativo, aggiornando la variabile che controlla la condizione.'},
+    {t:'Calcola la somma dei numeri da 1 a N (N chiesto in input) usando un ciclo <code>while</code>.', d:'●●●●', sol:'n = int(input("N: "))\nsomma = 0\nconta = 1\nwhile conta <= n:\n    somma += conta\n    conta += 1\nprint("Somma:", somma)', sp:'Servono due variabili: un contatore (<code>conta</code>) che scorre da 1 a N, e un accumulatore (<code>somma</code>) che tiene il totale.'},
+    {t:'Chiedi un numero decimale e usa <code>math.floor</code> e <code>math.ceil</code> per mostrarne l\'arrotondamento per difetto e per eccesso.', d:'●●●●', sol:'import math\nn = float(input("Numero: "))\nprint("Per difetto:", math.floor(n))\nprint("Per eccesso:", math.ceil(n))', sp:'<code>floor</code> "taglia" verso il basso, <code>ceil</code> arrotonda sempre verso l\'alto, anche di pochissimo (es. 4.01 → 5).'},
+    {t:'Simula un PIN: genera un PIN casuale a 4 cifre (tra 1000 e 9999) con <code>random</code>; l\'utente ha al massimo 3 tentativi per indovinarlo, usando un ciclo <code>while</code> con un contatore dei tentativi.', d:'●●●●●', sol:'import random\npin_segreto = random.randint(1000, 9999)\ntentativi = 0\nindovinato = False\nwhile tentativi < 3 and not indovinato:\n    pin_inserito = int(input("Inserisci il PIN: "))\n    tentativi += 1\n    if pin_inserito == pin_segreto:\n        indovinato = True\n        print("PIN corretto!")\n    else:\n        print("PIN errato, tentativi rimasti:", 3 - tentativi)\nif not indovinato:\n    print("Tentativi esauriti. Il PIN era", pin_segreto)', sp:'La condizione del <code>while</code> combina due cose con <code>and</code>: che restino tentativi <b>e</b> che il PIN non sia ancora stato indovinato.'},
+  ]
+},
+{
+  titolo: "Il ciclo for, range, liste e stringhe",
+  eyebrow: "Lezione 4 di 5",
+  obiettivi: "La ripetizione definita con for, la funzione range, indici, slicing e len su liste e stringhe.",
+  ripasso: `
+    <h3>La ripetizione definita: for</h3>
+    <p>Il ciclo <code>for</code> si usa quando sappiamo (o Python può calcolare) quante volte ripetere qualcosa: scorre gli elementi di una sequenza uno a uno.</p>
+    <pre>for lettera in "ciao":
+    print(lettera)</pre>
+    <h3>La funzione range</h3>
+    <p><code>range(stop)</code> genera i numeri da 0 a stop-1. <code>range(start, stop)</code> parte da start. <code>range(start, stop, step)</code> aggiunge un passo, anche negativo.</p>
+    <pre>for i in range(5):        # 0 1 2 3 4
+    print(i)
+for i in range(2, 10, 2): # 2 4 6 8
+    print(i)</pre>
+    <h3>Indici e slicing</h3>
+    <p>Ogni elemento di una lista o carattere di una stringa ha una posizione (indice), a partire da 0. Gli indici negativi contano dalla fine (-1 è l'ultimo). Lo <b>slicing</b> <code>[inizio:fine:passo]</code> estrae una porzione della sequenza (l'indice "fine" è escluso).</p>
+    <pre>frutta = ["mela", "pera", "kiwi", "uva"]
+print(frutta[0])    # mela
+print(frutta[-1])   # uva
+print(frutta[1:3])  # ['pera', 'kiwi']
+s = "programmazione"
+print(s[0:4])       # prog
+print(s[::-1])      # stringa al contrario</pre>
+    <h3>La funzione len</h3>
+    <p><code>len(x)</code> restituisce il numero di elementi di una lista o il numero di caratteri di una stringa.</p>
+    <pre>print(len(frutta))  # 4
+print(len(s))       # 14</pre>
+  `,
+  esercizi: [
+    {t:'Usa un ciclo <code>for</code> con <code>range</code> per stampare i numeri da 0 a 9.', d:'●', sol:'for i in range(10):\n    print(i)', sp:'<code>range(10)</code> genera i numeri da 0 a 9: 10 valori, ma l\'ultimo è 9 perché "stop" è escluso.'},
+    {t:'Stampa i numeri pari da 0 a 20 usando <code>range</code> con il passo.', d:'●', sol:'for i in range(0, 21, 2):\n    print(i)', sp:'Il terzo parametro di <code>range</code> è il passo: partendo da 0 e saltando di 2 in 2 si ottengono solo i pari.'},
+    {t:'Data una lista di 5 nomi (creala tu), stampa il primo e l\'ultimo elemento usando gli indici.', d:'●', sol:'nomi = ["Anna", "Luca", "Sara", "Marco", "Elena"]\nprint(nomi[0])\nprint(nomi[-1])', sp:'L\'indice <code>0</code> è sempre il primo elemento; <code>-1</code> è un modo comodo per indicare l\'ultimo, qualunque sia la lunghezza della lista.'},
+    {t:'Data una stringa a tua scelta, stampa i suoi primi 3 caratteri e gli ultimi 3 usando lo slicing.', d:'●●', sol:'s = "informatica"\nprint(s[:3])    # primi 3\nprint(s[-3:])   # ultimi 3', sp:'Omettere l\'inizio dello slicing significa "parti dall\'inizio"; omettere la fine significa "arriva fino alla fine".'},
+    {t:'Calcola e stampa la lunghezza di una lista e di una stringa a tua scelta usando <code>len()</code>.', d:'●●', sol:'lista = [1, 2, 3, 4]\ntesto = "python"\nprint(len(lista))  # 4\nprint(len(testo))  # 6', sp:'<code>len()</code> funziona allo stesso modo su qualsiasi sequenza: liste, stringhe, e come vedremo anche tuple.'},
+    {t:'Data una lista di numeri con almeno 6 elementi, stampa solo quelli dalla posizione 2 alla 4 (slicing).', d:'●●', sol:'numeri = [10, 20, 30, 40, 50, 60]\nprint(numeri[2:5])', sp:'Per includere l\'elemento in posizione 4, la "fine" dello slicing deve essere 5, perché l\'ultimo indice è sempre escluso.'},
+    {t:'Stampa una stringa al contrario usando lo slicing <code>[::-1]</code>.', d:'●●●', sol:'s = "programmazione"\nprint(s[::-1])', sp:'Un passo negativo (<code>-1</code>) percorre la sequenza a ritroso, partendo dall\'ultimo carattere.'},
+    {t:'Usa <code>for i in range(len(lista))</code> per stampare ogni elemento di una lista insieme al suo indice.', d:'●●●', sol:'colori = ["rosso", "verde", "blu"]\nfor i in range(len(colori)):\n    print(i, colori[i])', sp:'<code>range(len(lista))</code> genera esattamente gli indici validi della lista, da 0 fino all\'ultimo elemento.'},
+    {t:'Data una lista di numeri, calcola la somma di tutti gli elementi usando un ciclo <code>for</code>.', d:'●●●●', sol:'numeri = [4, 8, 15, 16, 23, 42]\nsomma = 0\nfor n in numeri:\n    somma += n\nprint("Somma totale:", somma)', sp:'Qui usiamo il for "per elemento" (<code>for n in numeri</code>): non serve conoscere gli indici, basta scorrere i valori.'},
+    {t:'Chiedi una parola all\'utente e stampa se è un palindromo (si legge uguale al contrario), confrontandola con il suo slicing invertito.', d:'●●●●●', sol:'parola = input("Scrivi una parola: ")\nif parola == parola[::-1]:\n    print("È un palindromo")\nelse:\n    print("Non è un palindromo")', sp:'Basta confrontare la stringa originale con la sua versione invertita <code>parola[::-1]</code>: se sono uguali, è un palindromo.'},
+  ]
+},
+{
+  titolo: "Manipolazione di liste e stringhe",
+  eyebrow: "Lezione 5 di 5",
+  obiettivi: "Manipolazione di liste, concatenazione di stringhe, scorrimento per indice e per elemento (in).",
+  ripasso: `
+    <h3>Manipolare le liste</h3>
+    <p>Le liste sono <b>mutabili</b>: si possono modificare dopo averle create. I metodi più usati: <code>append(x)</code> aggiunge x in fondo, <code>insert(i, x)</code> inserisce x in posizione i, <code>remove(x)</code> toglie la prima occorrenza di x, <code>sort()</code> ordina la lista.</p>
+    <pre>lista = [3, 1, 2]
+lista.append(9)     # [3, 1, 2, 9]
+lista.remove(1)      # [3, 2, 9]
+lista.sort()          # [2, 3, 9]</pre>
+    <h3>Concatenazione di stringhe</h3>
+    <p>L'operatore <code>+</code> unisce due stringhe in una nuova. Ricorda che non si può concatenare direttamente una stringa con un numero: serve <code>str()</code>.</p>
+    <pre>nome = "Anna"
+cognome = "Rossi"
+nome_completo = nome + " " + cognome
+print(nome_completo)   # Anna Rossi</pre>
+    <h3>Scorrere liste e stringhe: per indice o per elemento</h3>
+    <p>Ci sono due modi per scorrere una sequenza con <code>for</code>: <b>per indice</b>, con <code>range(len(...))</code>, utile quando serve conoscere la posizione; <b>per elemento</b>, con <code>for elemento in sequenza</code>, più semplice quando basta il valore. L'operatore <code>in</code> verifica anche solo l'appartenenza, senza ciclo.</p>
+    <pre>for i in range(len(lista)):   # per indice
+    print(i, lista[i])
+
+for elemento in lista:        # per elemento
+    print(elemento)
+
+if 9 in lista:                # verifica appartenenza
+    print("C'è!")</pre>
+  `,
+  esercizi: [
+    {t:'Crea una lista vuota e aggiungi 5 numeri a tua scelta con <code>append()</code>, poi stampa la lista completa.', d:'●', sol:'numeri = []\nnumeri.append(4)\nnumeri.append(8)\nnumeri.append(15)\nnumeri.append(16)\nnumeri.append(23)\nprint(numeri)', sp:'<code>append()</code> aggiunge sempre un elemento in fondo alla lista, uno alla volta.'},
+    {t:'Data una lista di nomi, rimuovi un elemento specifico con <code>remove()</code> e stampa la lista aggiornata.', d:'●', sol:'nomi = ["Anna", "Luca", "Sara", "Marco"]\nnomi.remove("Luca")\nprint(nomi)', sp:'<code>remove()</code> cerca il valore indicato e toglie la sua prima occorrenza dalla lista.'},
+    {t:'Chiedi nome e cognome all\'utente (in due input separati) e crea un\'unica stringa concatenandoli con uno spazio in mezzo.', d:'●●', sol:'nome = input("Nome: ")\ncognome = input("Cognome: ")\nnome_completo = nome + " " + cognome\nprint(nome_completo)', sp:'La concatenazione con <code>+</code> unisce le stringhe così come sono: lo spazio va aggiunto esplicitamente tra le due.'},
+    {t:'Data una lista di numeri, scorrila con <code>for...in</code> (per elemento) e stampa solo quelli pari.', d:'●●', sol:'numeri = [3, 8, 11, 20, 7, 14]\nfor n in numeri:\n    if n % 2 == 0:\n        print(n)', sp:'Scorrendo "per elemento" non serve calcolare gli indici: si lavora direttamente sul valore <code>n</code>.'},
+    {t:'Scorri una stringa carattere per carattere con <code>for...in</code> e conta quante vocali contiene.', d:'●●●', sol:'testo = input("Scrivi una frase: ")\nconta_vocali = 0\nfor carattere in testo:\n    if carattere.lower() in "aeiou":\n        conta_vocali += 1\nprint("Vocali trovate:", conta_vocali)', sp:'L\'operatore <code>in</code> qui verifica se un singolo carattere appartiene alla stringa <code>"aeiou"</code>: è un modo compatto per controllare più valori possibili.'},
+    {t:'Data una lista di numeri, trova il massimo e il minimo scorrendola con un ciclo, <b>senza</b> usare <code>max()</code> o <code>min()</code>.', d:'●●●', sol:'numeri = [12, 4, 55, 3, 27]\nmassimo = numeri[0]\nminimo = numeri[0]\nfor n in numeri:\n    if n > massimo:\n        massimo = n\n    if n < minimo:\n        minimo = n\nprint("Massimo:", massimo)\nprint("Minimo:", minimo)', sp:'Si parte ipotizzando che il primo elemento sia sia il massimo che il minimo, e si aggiornano questi valori solo quando si trova qualcosa di più grande o più piccolo.'},
+    {t:'Chiedi all\'utente una serie di numeri interi separati da spazio (usa <code>.split()</code>), inseriscili in una lista e ordinala con <code>sort()</code>.', d:'●●●●', sol:'testo = input("Inserisci numeri separati da spazio: ")\nnumeri = [int(x) for x in testo.split()]\nnumeri.sort()\nprint("Lista ordinata:", numeri)', sp:'<code>.split()</code> spezza la stringa in una lista di pezzi separati dagli spazi; ogni pezzo va poi convertito in <code>int</code> prima di ordinare.'},
+    {t:'Data una lista di parole, crea un\'unica stringa concatenandole con uno spazio, <b>senza</b> usare <code>join()</code> (usa un ciclo e <code>+=</code>).', d:'●●●●', sol:'parole = ["Python", "è", "divertente"]\nfrase = ""\nfor p in parole:\n    frase += p + " "\nfrase = frase.strip()\nprint(frase)', sp:'Si costruisce la stringa un pezzo alla volta con <code>+=</code>; <code>.strip()</code> alla fine toglie lo spazio in più rimasto dopo l\'ultima parola.'},
+    {t:'Chiedi all\'utente quanti numeri vuole inserire (N), poi con un ciclo <code>for i in range(N)</code> chiedili uno alla volta, aggiungili a una lista e infine stampa la lista e la somma totale.', d:'●●●●●', sol:'n = int(input("Quanti numeri vuoi inserire? "))\nnumeri = []\nfor i in range(n):\n    valore = int(input("Numero " + str(i + 1) + ": "))\n    numeri.append(valore)\nprint("Lista:", numeri)\nprint("Somma:", sum(numeri))', sp:'<code>range(n)</code> ripete esattamente n volte, tante quante l\'utente ha chiesto: è l\'esempio classico in cui la ripetizione "definita" è la scelta giusta rispetto a un <code>while</code>.'},
+    {t:'Data una lista di nomi, crea una nuova lista contenente solo quelli che iniziano con una vocale, scorrendo con <code>for...in</code> e usando lo slicing per controllare il primo carattere.', d:'●●●●●', sol:'nomi = ["Anna", "Luca", "Elena", "Marco", "Ilaria", "Sara"]\ncon_vocale = []\nfor nome in nomi:\n    if nome[0].lower() in "aeiou":\n        con_vocale.append(nome)\nprint("Nomi che iniziano per vocale:", con_vocale)', sp:'<code>nome[0]</code> estrae solo il primo carattere (uno slicing/indice su una stringa dentro una lista); <code>.lower()</code> rende il controllo valido anche se la vocale è maiuscola.'},
+  ]
+}
+];
+
+const tabbar = document.getElementById('tabbar');
+const container = document.getElementById('lezioni-container');
+
+LEZIONI.forEach((lez, idx) => {
+  // tab
+  const tab = document.createElement('button');
+  tab.className = 'tab' + (idx===0 ? ' active' : '');
+  tab.innerHTML = `<span class="n">0${idx+1}</span>${lez.titolo}`;
+  tab.addEventListener('click', () => mostraLezione(idx));
+  tabbar.appendChild(tab);
+
+  // sezione lezione
+  const sec = document.createElement('section');
+  sec.className = 'lezione' + (idx===0 ? ' active' : '');
+  sec.id = 'lez-' + idx;
+
+  let esHtml = '';
+  lez.esercizi.forEach((es, j) => {
+    esHtml += `
+    <details class="esercizio">
+      <summary>
+        <span class="es-num">${j+1}</span>
+        <span class="es-testo">${es.t}</span>
+        <span class="es-diff">${es.d}</span>
+        <span class="es-toggle"></span>
+      </summary>
+      <div class="es-sol">
+        <pre>${es.sol}</pre>
+        <div class="spiega">${es.sp}</div>
+      </div>
+    </details>`;
+  });
+
+  sec.innerHTML = `
+    <div class="lez-head">
+      <div class="eyebrow">${lez.eyebrow}</div>
+      <h2>${lez.titolo}</h2>
+      <div class="obiettivi">${lez.obiettivi}</div>
+    </div>
+    <div class="ripasso">${lez.ripasso}</div>
+    <div class="es-title">Esercizi<span class="badge">${lez.esercizi.length} esercizi, difficoltà crescente</span></div>
+    ${esHtml}
+    <div class="lez-nav">
+      <button class="btn-prev" ${idx===0?'disabled':''}>← lezione precedente</button>
+      <span class="progress">${idx+1} / ${LEZIONI.length}</span>
+      <button class="btn-next" ${idx===LEZIONI.length-1?'disabled':''}>lezione successiva →</button>
+    </div>
+  `;
+  container.appendChild(sec);
+});
+
+function mostraLezione(idx){
+  document.querySelectorAll('.lezione').forEach((el,i)=>el.classList.toggle('active', i===idx));
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active', i===idx));
+  document.querySelector('.tabbar-wrap').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+container.addEventListener('click', (e) => {
+  if(e.target.classList.contains('btn-next')){
+    const cur = [...document.querySelectorAll('.lezione')].findIndex(el=>el.classList.contains('active'));
+    if(cur < LEZIONI.length-1) mostraLezione(cur+1);
+  }
+  if(e.target.classList.contains('btn-prev')){
+    const cur = [...document.querySelectorAll('.lezione')].findIndex(el=>el.classList.contains('active'));
+    if(cur > 0) mostraLezione(cur-1);
+  }
+});
+</script>
+</body>
+</html>
