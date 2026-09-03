@@ -626,6 +626,17 @@ cognome = "Rossi"
 nome_completo = nome + " " + cognome
 print(nome_completo)   # Anna Rossi
 print("eh " * 3)         # eh eh eh </pre>
+
+<h3>Dividere una stringa in parole: split()</h3>
+<p><code>.split()</code> divide una stringa in una lista di "pezzi", usando come separatore lo spazio di default. Si può anche indicare un separatore diverso tra parentesi, ad esempio una virgola o un trattino. È utile per trasformare una frase in una lista di parole su cui poi scorrere con un ciclo.</p>
+<pre>frase = "il gatto nero"
+parole = frase.split()
+print(parole)        # ['il', 'gatto', 'nero']
+
+data = "12-05-2024"
+pezzi = data.split("-")
+print(pezzi)          # ['12', '05', '2024']</pre>
+
     <h3>Scorrere le liste per indice</h3>
     <p>Per una lista scorriamo sempre <b>per indice</b>, con <code>range(len(lista))</code>: è il modo che ci permette di leggere, confrontare e modificare gli elementi conoscendone la posizione.</p>
     <pre>lista = [3, 10, 2, 9]
@@ -633,7 +644,7 @@ for i in range(len(lista)):
     print(i, lista[i])</pre>
   `,
   esercizi: [
-    {t:'Crea una lista vuota e aggiungi 5 numeri a tua scelta con <code>append()</code>, poi stampa la lista completa.', d:'●', sol:'numeri = []\nnumeri.append(4)\nnumeri.append(8)\nnumeri.append(15)\nnumeri.append(16)\nnumeri.append(23)\nprint(numeri)', sp:'<code>append()</code> aggiunge sempre un elemento in fondo alla lista, uno alla volta.'},
+    {t:'Crea una lista vuota chiamata <code>numeri</code> e usa un ciclo <code>for</code> con <code>range()</code> per aggiungerle, uno alla volta con <code>append()</code>, i primi 5 numeri pari (2, 4, 6, 8, 10). Poi stampa la lista completa.', d:'●', sol:'numeri = []\nfor n in range(2, 11, 2):\n    numeri.append(n)\nprint(numeri)', sp:'<code>range(2, 11, 2)</code> genera i numeri pari da 2 a 10; a ogni giro del <code>for</code>, <code>append()</code> aggiunge il valore corrente in fondo alla lista, uno alla volta.'},
     {t:'Data una lista di nomi, rimuovi un elemento specifico con <code>remove()</code> e stampa la lista aggiornata.', d:'●', sol:'nomi = ["Anna", "Luca", "Sara", "Marco"]\nnomi.remove("Luca")\nprint(nomi)', sp:'<code>remove()</code> cerca il valore indicato e toglie la sua prima occorrenza dalla lista.'},
     {t:'Chiedi nome e cognome all\'utente (in due input separati) e crea un\'unica stringa concatenandoli con uno spazio in mezzo.', d:'●●', sol:'nome = input("Nome: ")\ncognome = input("Cognome: ")\nnome_completo = nome + " " + cognome\nprint(nome_completo)', sp:'La concatenazione con <code>+</code> unisce le stringhe così come sono: lo spazio va aggiunto esplicitamente tra le due.'},
     {t:'Data una lista di numeri, scorrila per indice e stampa solo quelli pari.', d:'●●', sol:'numeri = [3, 8, 11, 20, 7, 14]\nfor i in range(len(numeri)):\n    if numeri[i] % 2 == 0:\n        print(numeri[i])', sp:'<code>range(len(numeri))</code> genera gli indici validi; a ogni giro si legge l\'elemento con <code>numeri[i]</code> e si controlla se è pari.'},
