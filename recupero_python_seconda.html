@@ -666,7 +666,6 @@ for i in range(len(lista)):
     <pre>import turtle
 turtle.forward(100)   # avanza di 100 pixel
 turtle.left(90)        # gira a sinistra di 90°</pre>
-    <p><b>Nota:</b> questi esercizi vanno provati in Thonny (o un altro ambiente Python sul computer), perché il modulo turtle apre una finestra grafica che il pulsante "esegui codice" di questo sito non riesce a mostrare.</p>
     <h3>Muoversi e ruotare</h3>
     <p><code>forward(n)</code>/<code>fd(n)</code> fa avanzare la tartaruga di n pixel; <code>backward(n)</code> la fa arretrare. <code>left(angolo)</code> e <code>right(angolo)</code> la fanno ruotare, rispettivamente in senso antiorario e orario. <code>penup()</code> alza la penna (la tartaruga si sposta senza disegnare), <code>pendown()</code> la riabbassa.</p>
     <h3>Colori e riempimento</h3>
@@ -684,7 +683,6 @@ turtle.end_fill()</pre>
     <pre>import random
 colori = ["red", "green", "blue"]
 print(random.choice(colori))     # un colore a caso
-print(colori[7 % len(colori)])   # colori[1], "in loop"</pre>
   `,
   esercizi: [
     {t:'Disegna un quadrato di lato 100 pixel usando un ciclo <code>for</code>, invece di scrivere <code>forward</code> e <code>left</code> quattro volte di seguito.', d:'●', sol:'import turtle\n\nfor i in range(4):\n    turtle.forward(100)\n    turtle.left(90)', sp:'Un quadrato ha 4 lati uguali e 4 angoli di 90°: il ciclo for ripete esattamente 4 volte la stessa coppia di istruzioni (avanza e gira), invece di scriverle a mano quattro volte.'},
